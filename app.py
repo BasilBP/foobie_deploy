@@ -30,7 +30,7 @@ except OSError:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- Core Functions ---
+# --- Core Functions (same as before) ---
 def convert_serpapi_to_google_maps(url):
     """Convert SerpApi URL to Google Maps URL."""
     try:
@@ -456,265 +456,523 @@ def get_coordinates_from_address(address):
 
 @app.route("/")
 def index():
-    """Serve the main application page with embedded HTML."""
+    """Serve the main application page with FitMeal-inspired design."""
     return """
     <!DOCTYPE html>
     <html lang="en">
     <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>Instagram Reel Location Finder</title>
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-      <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAwMDAAICAgAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
-
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>ReelBites | Discover Locations from Instagram</title>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
       <style>
+        :root {
+          --primary: #4CAF50;
+          --primary-dark: #388E3C;
+          --secondary: #FF9800;
+          --light: #F5F5F5;
+          --dark: #212121;
+          --gray: #757575;
+          --white: #FFFFFF;
+          --error: #F44336;
+          --success: #4CAF50;
+          --warning: #FFC107;
+        }
+        
         * {
-          box-sizing: border-box;
           margin: 0;
           padding: 0;
+          box-sizing: border-box;
         }
-
+        
         body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-          padding: 20px;
-          color: #333;
+          font-family: 'Poppins', sans-serif;
+          background-color: var(--light);
+          color: var(--dark);
+          line-height: 1.6;
         }
-
+        
         .container {
-          max-width: 900px;
+          max-width: 1200px;
           margin: 0 auto;
-          background: rgba(255, 255, 255, 0.95);
-          border-radius: 20px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-          overflow: hidden;
-          backdrop-filter: blur(10px);
+          padding: 0 20px;
         }
-
-        .header {
-          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-          color: white;
-          padding: 30px;
-          text-align: center;
+        
+        /* Header */
+        header {
+          background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+          color: var(--white);
+          padding: 20px 0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
-        .header h1 {
-          font-size: 2.5rem;
-          margin-bottom: 10px;
+        
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .logo {
+          font-family: 'Playfair Display', serif;
+          font-size: 28px;
           font-weight: 700;
+          display: flex;
+          align-items: center;
         }
-
-        .header p {
-          font-size: 1.1rem;
-          opacity: 0.9;
+        
+        .logo i {
+          margin-right: 10px;
+          color: var(--secondary);
         }
-
-        .main-content {
-          padding: 30px;
+        
+        nav ul {
+          display: flex;
+          list-style: none;
         }
-
-        .input-group {
+        
+        nav ul li {
+          margin-left: 30px;
+        }
+        
+        nav ul li a {
+          color: var(--white);
+          text-decoration: none;
+          font-weight: 500;
+          transition: all 0.3s ease;
+        }
+        
+        nav ul li a:hover {
+          color: var(--secondary);
+        }
+        
+        /* Hero Section */
+        .hero {
+          background: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+          height: 500px;
+          display: flex;
+          align-items: center;
+          position: relative;
+        }
+        
+        .hero::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero-content {
+          position: relative;
+          z-index: 1;
+          color: var(--white);
+          max-width: 600px;
+        }
+        
+        .hero h1 {
+          font-family: 'Playfair Display', serif;
+          font-size: 48px;
+          font-weight: 700;
+          margin-bottom: 20px;
+          line-height: 1.2;
+        }
+        
+        .hero p {
+          font-size: 18px;
+          margin-bottom: 30px;
+        }
+        
+        /* Search Section */
+        .search-section {
+          background-color: var(--white);
+          padding: 60px 0;
+          margin-top: -80px;
+          border-radius: 10px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          position: relative;
+          z-index: 2;
+        }
+        
+        .search-container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 0 20px;
+        }
+        
+        .search-box {
+          background-color: var(--white);
+          border-radius: 8px;
+          padding: 40px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .search-title {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        
+        .search-title h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 32px;
+          color: var(--dark);
+          margin-bottom: 10px;
+        }
+        
+        .search-title p {
+          color: var(--gray);
+        }
+        
+        .search-form {
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .form-group {
           margin-bottom: 20px;
         }
-
-        .input-label {
+        
+        .form-group label {
           display: block;
           margin-bottom: 8px;
-          font-weight: 600;
-          color: #555;
+          font-weight: 500;
+          color: var(--dark);
         }
-
-        .url-input {
+        
+        .form-control {
           width: 100%;
           padding: 15px 20px;
-          border: 2px solid #e1e5e9;
-          border-radius: 10px;
-          font-size: 1rem;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          font-size: 16px;
           transition: all 0.3s ease;
-          background: #f8f9fa;
         }
-
-        .url-input:focus {
+        
+        .form-control:focus {
           outline: none;
-          border-color: #667eea;
-          background: white;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
         }
-
-        .search-button {
-          width: 100%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 15px 30px;
+        
+        .btn {
+          display: inline-block;
+          background-color: var(--primary);
+          color: var(--white);
           border: none;
-          border-radius: 10px;
-          font-size: 1.1rem;
+          border-radius: 8px;
+          padding: 15px 30px;
+          font-size: 16px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
+          text-align: center;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
-
-        .search-button:hover {
+        
+        .btn:hover {
+          background-color: var(--primary-dark);
           transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-
-        .search-button:active {
+        
+        .btn:active {
           transform: translateY(0);
         }
-
-        .search-button:disabled {
-          background: #ccc;
-          cursor: not-allowed;
-          transform: none;
+        
+        .btn-block {
+          display: block;
+          width: 100%;
         }
-
-        .result-section {
-          margin-top: 30px;
+        
+        /* Results Section */
+        .results-section {
+          padding: 60px 0;
         }
-
-        .location-display {
-          background: #f8f9fa;
-          border: 2px solid #e9ecef;
-          border-radius: 10px;
-          padding: 20px;
+        
+        .results-container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+          .results-container {
+            grid-template-columns: 1fr;
+          }
+        }
+        
+        .location-card {
+          background-color: var(--white);
+          border-radius: 8px;
+          padding: 30px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .location-card h3 {
+          font-family: 'Playfair Display', serif;
+          font-size: 24px;
+          margin-bottom: 15px;
+          color: var(--dark);
+        }
+        
+        .location-info {
           margin-bottom: 20px;
-          min-height: 100px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          font-size: 1.1rem;
-          line-height: 1.5;
         }
-
-        .location-display.loading {
-          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-          background-size: 200% 100%;
-          animation: loading 1.5s infinite;
+        
+        .location-info p {
+          margin-bottom: 10px;
         }
-
-        .location-display.success {
-          background: #d4edda;
-          border-color: #c3e6cb;
-          color: #155724;
+        
+        .location-address {
+          color: var(--gray);
+          font-style: italic;
         }
-
-        .location-display.error {
-          background: #f8d7da;
-          border-color: #f5c6cb;
-          color: #721c24;
-        }
-
-        @keyframes loading {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-
-        .maps-link {
-          display: inline-block;
-          background: #4285f4;
-          color: white;
-          padding: 10px 20px;
-          border-radius: 5px;
-          text-decoration: none;
-          margin-top: 10px;
-          transition: background 0.3s ease;
-        }
-
-        .maps-link:hover {
-          background: #3367d6;
-        }
-
+        
         .map-container {
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
           height: 400px;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
-
+        
         #map {
           height: 100%;
           width: 100%;
         }
-
-        .status-indicator {
-          display: inline-block;
-          width: 8px;
-          height: 8px;
+        
+        .action-buttons {
+          display: flex;
+          gap: 15px;
+          margin-top: 20px;
+        }
+        
+        .btn-secondary {
+          background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+          background-color: #F57C00;
+        }
+        
+        /* Status Indicators */
+        .status {
+          display: flex;
+          align-items: center;
+          margin-bottom: 20px;
+          padding: 15px;
+          border-radius: 8px;
+        }
+        
+        .status i {
+          margin-right: 10px;
+          font-size: 20px;
+        }
+        
+        .status.loading {
+          background-color: rgba(255, 193, 7, 0.1);
+          color: #FFA000;
+        }
+        
+        .status.success {
+          background-color: rgba(76, 175, 80, 0.1);
+          color: var(--success);
+        }
+        
+        .status.error {
+          background-color: rgba(244, 67, 54, 0.1);
+          color: var(--error);
+        }
+        
+        /* Footer */
+        footer {
+          background-color: var(--dark);
+          color: var(--white);
+          padding: 40px 0 20px;
+        }
+        
+        .footer-content {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 30px;
+          margin-bottom: 30px;
+        }
+        
+        .footer-column h4 {
+          font-family: 'Playfair Display', serif;
+          font-size: 18px;
+          margin-bottom: 20px;
+          position: relative;
+          padding-bottom: 10px;
+        }
+        
+        .footer-column h4::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 50px;
+          height: 2px;
+          background-color: var(--primary);
+        }
+        
+        .footer-column ul {
+          list-style: none;
+        }
+        
+        .footer-column ul li {
+          margin-bottom: 10px;
+        }
+        
+        .footer-column ul li a {
+          color: #BDBDBD;
+          text-decoration: none;
+          transition: all 0.3s ease;
+        }
+        
+        .footer-column ul li a:hover {
+          color: var(--white);
+          padding-left: 5px;
+        }
+        
+        .social-links {
+          display: flex;
+          gap: 15px;
+          margin-top: 20px;
+        }
+        
+        .social-links a {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          background-color: rgba(255, 255, 255, 0.1);
           border-radius: 50%;
-          margin-right: 8px;
+          color: var(--white);
+          transition: all 0.3s ease;
         }
-
-        .status-indicator.loading {
-          background: #ffc107;
-          animation: pulse 1.5s infinite;
+        
+        .social-links a:hover {
+          background-color: var(--primary);
+          transform: translateY(-3px);
         }
-
-        .status-indicator.success {
-          background: #28a745;
-        }
-
-        .status-indicator.error {
-          background: #dc3545;
-        }
-
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-
-        .footer {
-          background: #f8f9fa;
-          padding: 20px;
+        
+        .copyright {
           text-align: center;
-          color: #6c757d;
-          font-size: 0.9rem;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          color: #BDBDBD;
+          font-size: 14px;
         }
-
+        
+        /* Responsive */
         @media (max-width: 768px) {
-          .header h1 {
-            font-size: 2rem;
+          .header-content {
+            flex-direction: column;
+            text-align: center;
           }
           
-          .main-content {
+          nav ul {
+            margin-top: 20px;
+          }
+          
+          nav ul li {
+            margin: 0 10px;
+          }
+          
+          .hero h1 {
+            font-size: 36px;
+          }
+          
+          .hero p {
+            font-size: 16px;
+          }
+          
+          .search-box {
             padding: 20px;
-          }
-          
-          body {
-            padding: 10px;
           }
         }
       </style>
     </head>
     <body>
-      <div class="container">
-        <div class="header">
-          <h1>🗺️ Instagram Location Finder</h1>
-          <p>Extract and discover locations from Instagram reels with precision</p>
-        </div>
-        
-        <div class="main-content">
-          <div class="input-group">
-            <label class="input-label" for="reel-url">Instagram Reel URL</label>
-            <input 
-              type="text" 
-              id="reel-url" 
-              class="url-input"
-              placeholder="Paste your Instagram reel URL here (e.g., https://www.instagram.com/reel/...)" 
-            />
+      <!-- Header -->
+      <header>
+        <div class="container header-content">
+          <div class="logo">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>ReelBites</span>
           </div>
+          <nav>
+            <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">How It Works</a></li>
+              <li><a href="#">About</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+      
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container hero-content">
+          <h1>Discover Amazing Locations From Instagram</h1>
+          <p>Find any place featured in Instagram reels with our powerful location finder tool. Perfect for foodies, travelers, and explorers.</p>
+        </div>
+      </section>
+      
+      <!-- Search Section -->
+      <section class="search-section">
+        <div class="search-container">
+          <div class="search-box">
+            <div class="search-title">
+              <h2>Find a Location</h2>
+              <p>Paste an Instagram reel URL below to discover the location</p>
+            </div>
+            
+            <div class="search-form">
+              <div class="form-group">
+                <label for="reel-url">Instagram Reel URL</label>
+                <input 
+                  type="text" 
+                  id="reel-url" 
+                  class="form-control"
+                  placeholder="https://www.instagram.com/reel/..." 
+                />
+              </div>
+              
+              <button class="btn btn-block" onclick="fetchLocation()" id="search-btn">
+                <i class="fas fa-search"></i> Find Location
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Results Section -->
+      <section class="results-section">
+        <div class="container">
+          <div id="status-container"></div>
           
-          <button class="search-button" onclick="fetchLocation()" id="search-btn">
-            🔍 Find Location
-          </button>
-          
-          <div class="result-section">
-            <div id="location-text" class="location-display">
-              <span>🎯 Ready to find location! Paste an Instagram reel URL and click search.</span>
+          <div class="results-container">
+            <div class="location-card">
+              <h3>Location Details</h3>
+              <div class="location-info" id="location-text">
+                <p>Ready to find locations! Paste an Instagram reel URL and click search.</p>
+              </div>
+              
+              <div class="action-buttons" id="action-buttons" style="display: none;">
+                <a href="#" class="btn" id="maps-link" target="_blank">
+                  <i class="fas fa-map-marked-alt"></i> View on Maps
+                </a>
+                <button class="btn btn-secondary" onclick="copyToClipboard()">
+                  <i class="fas fa-copy"></i> Copy Address
+                </button>
+              </div>
             </div>
             
             <div class="map-container">
@@ -722,54 +980,139 @@ def index():
             </div>
           </div>
         </div>
-        
-        <div class="footer">
-          <p>💡 Tip: Make sure the Instagram reel contains location information in its description</p>
+      </section>
+      
+      <!-- Footer -->
+      <footer>
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-column">
+              <h4>ReelBites</h4>
+              <p>Discover amazing locations from Instagram reels with our powerful location finder tool.</p>
+              <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              </div>
+            </div>
+            
+            <div class="footer-column">
+              <h4>Quick Links</h4>
+              <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">How It Works</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </div>
+            
+            <div class="footer-column">
+              <h4>Support</h4>
+              <ul>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Help Center</a></li>
+              </ul>
+            </div>
+            
+            <div class="footer-column">
+              <h4>Contact Us</h4>
+              <ul>
+                <li><i class="fas fa-map-marker-alt"></i> 123 Street, Kochi, India</li>
+                <li><i class="fas fa-phone"></i> +91 1234567890</li>
+                <li><i class="fas fa-envelope"></i> info@ReelBites.com</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="copyright">
+            <p>&copy; 2023 ReelBites. All Rights Reserved.</p>
+          </div>
         </div>
-      </div>
-
+      </footer>
+      
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <script>
-        // Initialize map
-        const map = L.map('map').setView([20.5937, 78.9629], 4);
+        // Initialize map centered on India
+        const map = L.map('map').setView([20.5937, 78.9629], 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '© OpenStreetMap contributors'
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-
+        
         let currentMarker = null;
-
-        function updateLocationDisplay(content, type = 'default') {
-          const locationDisplay = document.getElementById('location-text');
-          const statusIndicator = '<span class="status-indicator ' + type + '"></span>';
+        let currentLocationData = null;
+        
+        // Update status display
+        function updateStatus(message, type) {
+          const statusContainer = document.getElementById('status-container');
+          let icon = '';
           
-          locationDisplay.className = 'location-display ' + type;
-          locationDisplay.innerHTML = statusIndicator + content;
+          if (type === 'loading') {
+            icon = '<i class="fas fa-spinner fa-spin"></i>';
+          } else if (type === 'success') {
+            icon = '<i class="fas fa-check-circle"></i>';
+          } else if (type === 'error') {
+            icon = '<i class="fas fa-exclamation-circle"></i>';
+          }
+          
+          statusContainer.innerHTML = `
+            <div class="status ${type}">
+              ${icon}
+              <span>${message}</span>
+            </div>
+          `;
         }
-
+        
+        // Update location display
+        function updateLocationDisplay(content, address = null) {
+          const locationDisplay = document.getElementById('location-text');
+          const actionButtons = document.getElementById('action-buttons');
+          
+          if (address) {
+            locationDisplay.innerHTML = `
+              <h3>${content}</h3>
+              <p class="location-address">${address}</p>
+            `;
+            actionButtons.style.display = 'flex';
+          } else {
+            locationDisplay.innerHTML = `<p>${content}</p>`;
+            actionButtons.style.display = 'none';
+          }
+        }
+        
+        // Update button state during loading
         function updateButtonState(isLoading) {
           const button = document.getElementById('search-btn');
-          const input = document.getElementById('reel-url');
           
           if (isLoading) {
             button.disabled = true;
-            button.innerHTML = '🔄 Searching...';
-            input.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
           } else {
             button.disabled = false;
-            button.innerHTML = '🔍 Find Location';
-            input.disabled = false;
+            button.innerHTML = '<i class="fas fa-search"></i> Find Location';
           }
         }
-
+        
+        // Add marker to map
         function addMarkerToMap(lat, lon, name, address) {
           // Remove existing marker
           if (currentMarker) {
             map.removeLayer(currentMarker);
           }
           
-          // Add new marker
-          currentMarker = L.marker([lat, lon]).addTo(map);
+          // Add new marker with custom icon
+          const greenIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
+          
+          currentMarker = L.marker([lat, lon], {icon: greenIcon}).addTo(map);
           
           // Create popup content
           const popupContent = `
@@ -781,27 +1124,46 @@ def index():
           
           currentMarker.bindPopup(popupContent).openPopup();
           
-          // Center map on location
-          map.setView([lat, lon], 15);
+          // Center map on location with smooth zoom
+          map.flyTo([lat, lon], 15, {
+            duration: 1,
+            easeLinearity: 0.25
+          });
         }
-
+        
+        // Copy address to clipboard
+        function copyToClipboard() {
+          if (!currentLocationData) return;
+          
+          const text = `${currentLocationData.location_text}\n${currentLocationData.address}`;
+          navigator.clipboard.writeText(text)
+            .then(() => {
+              alert('Address copied to clipboard!');
+            })
+            .catch(err => {
+              console.error('Could not copy text: ', err);
+            });
+        }
+        
+        // Main function to fetch location
         async function fetchLocation() {
           const url = document.getElementById('reel-url').value.trim();
           
           if (!url) {
-            updateLocationDisplay('❗ Please enter an Instagram reel URL', 'error');
+            updateStatus('Please enter an Instagram reel URL', 'error');
             return;
           }
           
           // Validate URL format
           const instagramRegex = /instagram\.com\/(reel|p)\//;
           if (!instagramRegex.test(url)) {
-            updateLocationDisplay('❗ Please enter a valid Instagram reel URL', 'error');
+            updateStatus('Please enter a valid Instagram reel URL', 'error');
             return;
           }
           
           updateButtonState(true);
-          updateLocationDisplay('🔍 Analyzing Instagram reel...', 'loading');
+          updateStatus('Analyzing Instagram reel...', 'loading');
+          updateLocationDisplay('Searching for location information...');
           
           try {
             const response = await fetch('/get_location', {
@@ -813,39 +1175,45 @@ def index():
             });
             
             const data = await response.json();
+            currentLocationData = data;
             
             if (response.ok) {
-              let displayContent = data.location_text;
-              
-              // Add maps link if available
-              if (data.maps_url) {
-                displayContent += `<br><br><a href="${data.maps_url}" target="_blank" class="maps-link">🗺️ View on Google Maps</a>`;
-              }
-              
-              // Add address if available and different from location text
-              if (data.address && data.address !== data.location_text) {
-                displayContent += `<br><small style="color: #666; font-style: italic;">📍 ${data.address}</small>`;
-              }
-              
-              updateLocationDisplay(displayContent, 'success');
-              
-              // Add marker to map if coordinates are available
               if (data.lat && data.lon) {
+                // Successful location with coordinates
+                updateStatus('Location found successfully!', 'success');
+                updateLocationDisplay(data.location_text.replace('Found: ', '').replace('Found via geocoding: ', ''), 
+                               data.address || data.location_text);
+                
+                // Update maps link button
+                if (data.maps_url) {
+                  const mapsLink = document.getElementById('maps-link');
+                  mapsLink.href = data.maps_url;
+                }
+                
+                // Add marker to map
                 addMarkerToMap(data.lat, data.lon, 
                              data.location_text.replace('Found: ', '').replace('Found via geocoding: ', ''), 
                              data.address || 'Location found');
               } else {
-                // Reset map view if no coordinates
-                map.setView([20.5937, 78.9629], 4);
+                // Location found but no coordinates
+                updateStatus('Location identified but no precise coordinates found', 'warning');
+                updateLocationDisplay(data.location_text, data.address || data.location_text);
+                
+                // Reset map view
+                map.setView([20.5937, 78.9629], 5);
               }
-              
             } else {
-              updateLocationDisplay(`❌ ${data.error || 'Failed to find location'}`, 'error');
+              // Error from server
+              updateStatus(data.error || 'Failed to find location', 'error');
+              updateLocationDisplay(data.error || 'Failed to find location');
+              
+              // Reset map view
+              map.setView([20.5937, 78.9629], 5);
             }
-            
           } catch (error) {
             console.error('Error:', error);
-            updateLocationDisplay('🚫 Network error. Please check your connection and try again.', 'error');
+            updateStatus('Network error. Please check your connection and try again.', 'error');
+            updateLocationDisplay('Network error. Please try again.');
           } finally {
             updateButtonState(false);
           }
